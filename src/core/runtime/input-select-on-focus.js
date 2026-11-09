@@ -5,9 +5,6 @@ License: https://github.com/rogie/figui3/blob/main/LICENSE
 */
 import { figBooleanAttribute, figNextFrame } from "../../shared/dom.js";
 
-// Tracks focus listeners for shared select-on-focus behavior on fig inputs.
-const figInputSelectOnFocusData = new WeakMap();
-
 function figInputSelectOnFocusEnabled(host) {
   return (
     !host.hasAttribute("select-on-focus") ||
@@ -76,56 +73,4 @@ function figHandleInputSelectOnFocus(host, input, overrides = {}) {
   figNextFrame(host, () => figInputSelectContent(host, input, overrides));
 }
 
-function figEnsureInputSelectOnFocusListener(host) {
-  const data = figInputSelectOnFocusData.get(host);
-  if (!data) return;
-  const input = data.getInput?.();
-  if (!input) return;
-  if (data.currentInput && data.currentInput !== input) {
-    data.currentInput.removeEventListener("focus", data.boundFocus);
-  }
-  data.currentInput = input;
-  input.removeEventListener("focus", data.boundFocus);
-  input.addEventListener("focus", data.boundFocus);
-}
-
-function figBindInputSelectOnFocus(host, getInput, options = {}) {
-  let data = figInputSelectOnFocusData.get(host);
-  if (!data) {
-    data = {
-      getInput,
-      options,
-      currentInput: null,
-      boundFocus: (event) => {
-        const input = data.getInput?.() ?? event.target;
-        figHandleInputSelectOnFocus(host, input, {
-          getSelectOptions: data.options.getSelectOptions,
-        });
-      },
-    };
-    figInputSelectOnFocusData.set(host, data);
-  } else {
-    data.getInput = getInput;
-    data.options = options;
-  }
-  figEnsureInputSelectOnFocusListener(host);
-}
-
-function figResyncInputSelectOnFocus(host) {
-  figEnsureInputSelectOnFocusListener(host);
-}
-
-function figUnbindInputSelectOnFocus(host) {
-  const data = figInputSelectOnFocusData.get(host);
-  if (!data) return;
-  data.currentInput?.removeEventListener("focus", data.boundFocus);
-  figInputSelectOnFocusData.delete(host);
-}
-
-export {
-  figBindInputSelectOnFocus,
-  figHandleInputSelectOnFocus,
-  figInputSelectContent,
-  figResyncInputSelectOnFocus,
-  figUnbindInputSelectOnFocus,
-};
+export { figHandleInputSelectOnFocus, figInputSelectContent };

@@ -13,10 +13,8 @@ import {
 } from "../runtime/index.js";
 import { figNormalizeTextOnlyInputSlots } from "../runtime/input-slots.js";
 import {
-  figBindInputSelectOnFocus,
+  figHandleInputSelectOnFocus,
   figInputSelectContent,
-  figResyncInputSelectOnFocus,
-  figUnbindInputSelectOnFocus,
 } from "../runtime/input-select-on-focus.js";
 
 /**
@@ -46,6 +44,7 @@ class FigInputText extends HTMLElement {
   #boundMouseDown;
   #boundInputChange;
   #boundNativeInput;
+  #boundFocus;
   #boundFocusControl;
   #boundAdornmentClick;
   #mutationObserver = null;
@@ -82,6 +81,9 @@ class FigInputText extends HTMLElement {
       this.dispatchEvent(
         new CustomEvent("input", { detail: this.value, bubbles: true }),
       );
+    };
+    this.#boundFocus = (e) => {
+      this.#handleFocus(e);
     };
     this.#boundFocusControl = () => {
       if (!this.disabled) this.focus();
@@ -152,7 +154,8 @@ class FigInputText extends HTMLElement {
     this.input.addEventListener("change", this.#boundInputChange);
     this.input.removeEventListener("input", this.#boundNativeInput);
     this.input.addEventListener("input", this.#boundNativeInput);
-    figBindInputSelectOnFocus(this, () => this.input);
+    this.input.removeEventListener("focus", this.#boundFocus);
+    this.input.addEventListener("focus", this.#boundFocus);
     this.#syncNativeResetBaseline();
     this.#unbindFormReset?.();
     this.#unbindFormReset = figBindFormReset(this, () =>
@@ -161,12 +164,12 @@ class FigInputText extends HTMLElement {
   }
 
   disconnectedCallback() {
-    figUnbindInputSelectOnFocus(this);
     this.#unbindFormReset?.();
     this.#unbindFormReset = null;
     if (this.input) {
       this.input.removeEventListener("change", this.#boundInputChange);
       this.input.removeEventListener("input", this.#boundNativeInput);
+      this.input.removeEventListener("focus", this.#boundFocus);
     }
     this.removeEventListener("click", this.#boundAdornmentClick);
     this.removeEventListener("pointerdown", this.#boundMouseDown);
@@ -246,6 +249,7 @@ class FigInputText extends HTMLElement {
       this.input.readOnly = this.readonly;
       this.input.addEventListener("change", this.#boundInputChange);
       this.input.addEventListener("input", this.#boundNativeInput);
+      this.input.addEventListener("focus", this.#boundFocus);
     }
     this.#syncInputA11yAttributes();
     this.#syncSearchPrefix();
@@ -254,8 +258,12 @@ class FigInputText extends HTMLElement {
     this.#syncPasswordToggle();
     this.#syncGeneratedAdornmentDisabled();
     figNormalizeTextOnlyInputSlots(this);
-    figResyncInputSelectOnFocus(this);
   }
+
+  #handleFocus(e) {
+    figHandleInputSelectOnFocus(this, e.target);
+  }
+
   #syncInputA11yAttributes() {
     if (!this.input) return;
     this.#a11yAttributes.forEach((name) => {

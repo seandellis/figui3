@@ -593,7 +593,6 @@ class FigInputNumber extends HTMLElement {
 
   #handleFocus(e) {
     this.#isInteracting = true;
-    // Reuse the number focus handler — stepper interaction already binds focus here.
     figHandleInputSelectOnFocus(this, e.target, this.#buildSelectContentOptions());
   }
 
