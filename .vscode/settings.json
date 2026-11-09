@@ -1,3 +1,5 @@
 {
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5501,
+  "window.title": "${activeEditorShort}${separator}${rootName}${separator}${profileName}${separator}[Branch: feat/input-auto-select]",
+  "specstory.cloudSync.enabled": "never"
 }

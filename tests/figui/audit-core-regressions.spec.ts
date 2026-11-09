@@ -713,6 +713,83 @@ test.describe("fig.js audit core regressions", () => {
     });
   });
 
+  test("input text and number select on focus with opt-out and unit-aware ranges", async ({
+    page,
+  }) => {
+    const state = await page.evaluate(async () => {
+      const waitFrame = () => new Promise(requestAnimationFrame);
+
+      const text = document.createElement("fig-input-text") as HTMLElement & {
+        value: string;
+        input: HTMLInputElement;
+        selectContent: () => void;
+      };
+      text.setAttribute("value", "hello");
+      document.body.append(text);
+      await waitFrame();
+      text.input.focus();
+      await waitFrame();
+      const textAll = {
+        start: text.input.selectionStart,
+        end: text.input.selectionEnd,
+      };
+
+      const textOff = document.createElement("fig-input-text") as HTMLElement & {
+        input: HTMLInputElement;
+      };
+      textOff.setAttribute("value", "nope");
+      textOff.setAttribute("select-on-focus", "false");
+      document.body.append(textOff);
+      await waitFrame();
+      textOff.input.focus();
+      await waitFrame();
+      const textDisabled = {
+        fullSelected:
+          textOff.input.selectionStart === 0 &&
+          textOff.input.selectionEnd === textOff.input.value.length,
+      };
+
+      const number = document.createElement("fig-input-number") as HTMLElement & {
+        input: HTMLInputElement;
+      };
+      number.setAttribute("value", "50");
+      number.setAttribute("units", "%");
+      document.body.append(number);
+      await waitFrame();
+      number.input.focus();
+      await waitFrame();
+      const numberNumeric = {
+        value: number.input.value,
+        start: number.input.selectionStart,
+        end: number.input.selectionEnd,
+      };
+
+      const readonly = document.createElement("fig-input-text") as HTMLElement & {
+        input: HTMLInputElement;
+      };
+      readonly.setAttribute("value", "locked");
+      readonly.setAttribute("readonly", "");
+      document.body.append(readonly);
+      await waitFrame();
+      readonly.input.focus();
+      await waitFrame();
+      const readonlySelect = {
+        fullSelected:
+          readonly.input.selectionStart === 0 &&
+          readonly.input.selectionEnd === readonly.input.value.length,
+      };
+
+      return { textAll, textDisabled, numberNumeric, readonlySelect };
+    });
+
+    expect(state).toEqual({
+      textAll: { start: 0, end: 5 },
+      textDisabled: { fullSelected: false },
+      numberNumeric: { value: "50%", start: 0, end: 2 },
+      readonlySelect: { fullSelected: false },
+    });
+  });
+
   test("malformed color values fall back without runtime errors", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));

@@ -791,7 +791,6 @@ class FigGradientEditor extends HTMLElement {
       );
       this.#selectStopRow(row);
       input?.focus();
-      input?.select();
     });
   }
 

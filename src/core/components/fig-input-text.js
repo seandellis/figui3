@@ -12,6 +12,12 @@ import {
   figValuesEqual,
 } from "../runtime/index.js";
 import { figNormalizeTextOnlyInputSlots } from "../runtime/input-slots.js";
+import {
+  figBindInputSelectOnFocus,
+  figInputSelectContent,
+  figResyncInputSelectOnFocus,
+  figUnbindInputSelectOnFocus,
+} from "../runtime/input-select-on-focus.js";
 
 /**
  * A custom text input element.
@@ -146,6 +152,7 @@ class FigInputText extends HTMLElement {
     this.input.addEventListener("change", this.#boundInputChange);
     this.input.removeEventListener("input", this.#boundNativeInput);
     this.input.addEventListener("input", this.#boundNativeInput);
+    figBindInputSelectOnFocus(this, () => this.input);
     this.#syncNativeResetBaseline();
     this.#unbindFormReset?.();
     this.#unbindFormReset = figBindFormReset(this, () =>
@@ -154,6 +161,7 @@ class FigInputText extends HTMLElement {
   }
 
   disconnectedCallback() {
+    figUnbindInputSelectOnFocus(this);
     this.#unbindFormReset?.();
     this.#unbindFormReset = null;
     if (this.input) {
@@ -176,6 +184,11 @@ class FigInputText extends HTMLElement {
   focus() {
     this.input.focus();
   }
+
+  selectContent(options = {}) {
+    figInputSelectContent(this, this.input, options);
+  }
+
   #ensureInputControl() {
     const wantsTextarea = this.multiline;
     const existing = this.querySelector("input,textarea");
@@ -241,6 +254,7 @@ class FigInputText extends HTMLElement {
     this.#syncPasswordToggle();
     this.#syncGeneratedAdornmentDisabled();
     figNormalizeTextOnlyInputSlots(this);
+    figResyncInputSelectOnFocus(this);
   }
   #syncInputA11yAttributes() {
     if (!this.input) return;

@@ -17,6 +17,13 @@ Import pure color math from `@rogieking/figui3/fig-color.js`.
 - Newline-delimited
 - JSON array: `["Left","Center"]` or `[{"value":"left","label":"Left"}]`
 
+## Shared input selection
+
+- `fig-input-text` and `fig-input-number` select their value on focus by default (`select-on-focus="false"` to disable).
+- `select-range`: `all` (default for text) or `numeric` (default for number; selects the number portion when `units` are shown).
+- `selectContent(options?)` selects programmatically without focusing.
+- Skipped when `disabled`, `readonly`, or the control value is empty.
+
 ## Shared input defaults
 
 - Property-compatible controls expose parsed `.default` / `.defaultValue` aliases, `.isDefault`, and `.resetToDefault()`.
@@ -37,14 +44,14 @@ Import pure color math from `@rogieking/figui3/fig-color.js`.
 
 - `type`: `text`, `email`, `password`, `search`, `url`
 - `size`: `""`, `large` (32px tall)
-- `value`, `placeholder`, `multiline`, `autoresize`, `resizable`, `disabled`, `readonly`, `full`
+- `value`, `placeholder`, `multiline`, `autoresize`, `resizable`, `disabled`, `readonly`, `full`, `select-on-focus`, `select-range`
 - Adornments: `slot="prepend"` and `slot="append"`
 
 ## `fig-input-number`
 
 - `size`: `""`, `large` (32px tall)
 - `variant`: `""`, `ghost`
-- `value`, `placeholder`, `min`, `max`, `step`, `precision`, `units`, `units-disallow`, `steppers`, `tabular`, `disabled`, `full`
+- `value`, `placeholder`, `min`, `max`, `step`, `precision`, `units`, `units-disallow`, `steppers`, `tabular`, `disabled`, `full`, `select-on-focus`, `select-range`
 - Adornments: `slot="prepend"` and `slot="append"`
 
 ## `fig-angle`

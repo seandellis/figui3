@@ -12,6 +12,10 @@ import {
   figValuesEqual,
 } from "../runtime/index.js";
 import { figNormalizeTextOnlyInputSlots } from "../runtime/input-slots.js";
+import {
+  figHandleInputSelectOnFocus,
+  figInputSelectContent,
+} from "../runtime/input-select-on-focus.js";
 
 /**
  * A custom numeric input element that uses type="text" with inputmode="decimal".
@@ -406,6 +410,16 @@ class FigInputNumber extends HTMLElement {
     this.input.focus();
   }
 
+  selectContent(options = {}) {
+    figInputSelectContent(this, this.input, {
+      ...options,
+      getSelectOptions: () => ({
+        units: options.units ?? this.#units,
+        unitPosition: options.unitPosition ?? this.#unitPosition,
+      }),
+    });
+  }
+
   #ensureInputControl() {
     const existing = this.querySelector("input");
     if (existing) return existing;
@@ -575,19 +589,12 @@ class FigInputNumber extends HTMLElement {
 
   #handleFocus(e) {
     this.#isInteracting = true;
-    setTimeout(() => {
-      const value = e.target.value;
-      if (value && this.#units) {
-        if (this.#unitPosition === "prefix") {
-          e.target.setSelectionRange(this.#units.length, value.length);
-        } else {
-          const unitPos = value.indexOf(this.#units);
-          if (unitPos > -1) {
-            e.target.setSelectionRange(0, unitPos);
-          }
-        }
-      }
-    }, 0);
+    figHandleInputSelectOnFocus(this, e.target, {
+      getSelectOptions: () => ({
+        units: this.#units,
+        unitPosition: this.#unitPosition,
+      }),
+    });
   }
 
   #handleBlur(e) {

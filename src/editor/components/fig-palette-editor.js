@@ -598,7 +598,6 @@ class FigPaletteEditor extends HTMLElement {
         `.fig-palette-editor-color-row[data-index="${index}"] .fig-palette-editor-color fig-input-text input`,
       );
       input?.focus();
-      input?.select();
     });
   }
 
