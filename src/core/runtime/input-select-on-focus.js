@@ -96,10 +96,12 @@ function figBindInputSelectOnFocus(host, getInput, options = {}) {
       getInput,
       options,
       currentInput: null,
-      boundFocus: (event) =>
-        figHandleInputSelectOnFocus(host, event.target, {
+      boundFocus: (event) => {
+        const input = data.getInput?.() ?? event.target;
+        figHandleInputSelectOnFocus(host, input, {
           getSelectOptions: data.options.getSelectOptions,
-        }),
+        });
+      },
     };
     figInputSelectOnFocusData.set(host, data);
   } else {

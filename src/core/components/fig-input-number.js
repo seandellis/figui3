@@ -410,14 +410,18 @@ class FigInputNumber extends HTMLElement {
     this.input.focus();
   }
 
-  selectContent(options = {}) {
-    figInputSelectContent(this, this.input, {
+  #buildSelectContentOptions(options = {}) {
+    return {
       ...options,
       getSelectOptions: () => ({
         units: options.units ?? this.#units,
         unitPosition: options.unitPosition ?? this.#unitPosition,
       }),
-    });
+    };
+  }
+
+  selectContent(options = {}) {
+    figInputSelectContent(this, this.input, this.#buildSelectContentOptions(options));
   }
 
   #ensureInputControl() {
@@ -589,12 +593,8 @@ class FigInputNumber extends HTMLElement {
 
   #handleFocus(e) {
     this.#isInteracting = true;
-    figHandleInputSelectOnFocus(this, e.target, {
-      getSelectOptions: () => ({
-        units: this.#units,
-        unitPosition: this.#unitPosition,
-      }),
-    });
+    // Reuse the number focus handler — stepper interaction already binds focus here.
+    figHandleInputSelectOnFocus(this, e.target, this.#buildSelectContentOptions());
   }
 
   #handleBlur(e) {

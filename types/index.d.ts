@@ -117,6 +117,12 @@ export interface FigCheckedElement extends FigValueElement<
   defaultChecked?: boolean;
 }
 
+export interface FigInputSelectContentOptions {
+  range?: "all" | "numeric";
+  units?: string;
+  unitPosition?: string;
+}
+
 export interface FigTextInputElement extends FigValueElement<
   string,
   string
@@ -124,6 +130,7 @@ export interface FigTextInputElement extends FigValueElement<
   input: HTMLInputElement;
   placeholder?: string;
   focus(options?: FocusOptions): void;
+  selectContent(options?: FigInputSelectContentOptions): void;
 }
 
 export interface FigNumberInputElement extends FigValueElement<
@@ -137,6 +144,7 @@ export interface FigNumberInputElement extends FigValueElement<
   precision?: number | null;
   units?: string;
   focus(options?: FocusOptions): void;
+  selectContent(options?: FigInputSelectContentOptions): void;
 }
 
 export interface FigSliderElement extends FigValueElement<

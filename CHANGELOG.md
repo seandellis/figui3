@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [11.9.1]
+
+### Added
+
+- `fig-input-text` and `fig-input-number` select their value on focus by default (`select-on-focus="false"` to opt out).
+- `select-range` (`all` | `numeric`) and `selectContent()` for programmatic selection without focusing.
+
+### Fixed
+
+- Number inputs with unit suffixes select only the numeric portion on focus when `select-range` is numeric (default for `fig-input-number`).
+
 ## [11.9.0]
 
 ### Added
