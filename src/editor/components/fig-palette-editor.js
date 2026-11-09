@@ -5,6 +5,7 @@ Required Notice: Copyright (c) 2026 Rogie King
 Licensor Line of Business: FigUI3 editor and lab (Figma-style plugin UI kit)
 */
 import "./fig-property.js";
+import { figCancelPendingInputSelectOnFocus } from "../../core/runtime/input-select-on-focus.js";
 import {
   figHexToOklch,
   figMapOklchToGamut,
@@ -734,6 +735,8 @@ class FigPaletteEditor extends HTMLElement {
           selection.end,
           selection.direction,
         );
+        // Beat deferred select-on-focus scheduled before this value sync.
+        figCancelPendingInputSelectOnFocus(active.closest("fig-input-text"));
       } catch {
         // Selection APIs are not available for every input type.
       }

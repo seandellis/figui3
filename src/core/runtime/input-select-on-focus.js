@@ -17,10 +17,23 @@ function figInputSelectRange(host, fallback = "all") {
   return raw === "numeric" ? "numeric" : "all";
 }
 
+/** Bumps so any pending focus-time select scheduled on the host is skipped. */
+function figCancelPendingInputSelectOnFocus(host) {
+  if (!host) return;
+  host.__figSelectOnFocusId = (host.__figSelectOnFocusId || 0) + 1;
+}
+
 function figSelectInputControl(input, options = {}) {
   if (!input || input.disabled || input.readOnly) return;
   const host = options.host;
   if (host && !figInputSelectOnFocusEnabled(host)) return;
+  // Respect explicit caret/range (e.g. palette sync after an external value update).
+  if (
+    input.selectionStart !== input.selectionEnd &&
+    input.selectionStart !== null
+  ) {
+    return;
+  }
   const value = input.value;
   if (!value) return;
 
@@ -70,7 +83,16 @@ function figInputSelectContent(host, input, overrides = {}) {
 }
 
 function figHandleInputSelectOnFocus(host, input, overrides = {}) {
-  figNextFrame(host, () => figInputSelectContent(host, input, overrides));
+  const id = (host.__figSelectOnFocusId = (host.__figSelectOnFocusId || 0) + 1);
+  figNextFrame(host, () => {
+    if (host.__figSelectOnFocusId !== id) return;
+    if (document.activeElement !== input) return;
+    figInputSelectContent(host, input, overrides);
+  });
 }
 
-export { figHandleInputSelectOnFocus, figInputSelectContent };
+export {
+  figCancelPendingInputSelectOnFocus,
+  figHandleInputSelectOnFocus,
+  figInputSelectContent,
+};
